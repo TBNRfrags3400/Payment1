@@ -1,0 +1,33 @@
+import stripe
+
+# Set your Stripe API keys
+stripe.api_key = 'YOUR_STRIPE_SECRET_KEY'
+
+# Create a payment intent
+def create_payment_intent(amount, currency='usd'):
+    payment_intent = stripe.PaymentIntent.create(
+        amount=amount,
+        currency=currency
+    )
+    return payment_intent.client_secret
+
+# Handle the payment webhook
+@app.route('/payment_webhook', methods=['POST'])
+def payment_webhook():
+    payload = request.get_data(as_text=True)
+    event = None
+
+    try:
+        event = stripe.Event.construct_from(
+            json.loads(payload), stripe.api_key
+        )
+    except ValueError as e:
+        return str(e), 400
+
+    if event.type == 'payment_intent.succeeded':
+        # Handle successful payment
+
+    elif event.type == 'payment_intent.payment_failed':
+        # Handle payment failure
+
+    return '', 200
